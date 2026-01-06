@@ -90,7 +90,13 @@ DATABASES = {
 }
 
 # Override with helper for production (Database URL)
+# Override with helper for production (Database URL)
 db_from_env = dj_database_url.config(conn_max_age=600)
+
+# Fix: Remove 'ssl-mode' if present, as it causes TypeError with mysqlclient
+if 'OPTIONS' in db_from_env and 'ssl-mode' in db_from_env['OPTIONS']:
+    del db_from_env['OPTIONS']['ssl-mode']
+
 DATABASES['default'].update(db_from_env)
 
 
