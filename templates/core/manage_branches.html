@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Branches{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2>School Branches</h2>
+        <a href="{% url 'add_branch' %}" class="btn">Add New Branch</a>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <th style="padding: 1rem;">Branch Name</th>
+                    <th style="padding: 1rem;">Address</th>
+                    <th style="padding: 1rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for branch in branches %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 1rem;">{{ branch.name }}</td>
+                    <td style="padding: 1rem;">{{ branch.address|default:"-" }}</td>
+                    <td style="padding: 1rem;">
+                        <a href="{% url 'edit_branch' branch.id %}" class="btn"
+                            style="padding: 6px 12px; font-size: 0.8rem; background: transparent; border: 1px solid var(--text-muted); margin-right: 0.5rem;">Edit</a>
+                        <a href="{% url 'delete_branch' branch.id %}" class="btn"
+                            style="padding: 6px 12px; font-size: 0.8rem; background: transparent; border: 1px solid var(--secondary); color: var(--secondary);"
+                            onclick="return confirm('Are you sure you want to delete this branch?');">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                        No branches found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

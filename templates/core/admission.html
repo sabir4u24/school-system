@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}New Admission{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <h2>New Student Admission</h2>
+            <p style="color: var(--text-muted)">Enter student details for the current academic session.</p>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <h3>Academic Details</h3>
+        <div class="d-grid grid-3 form-group">
+            <div>
+                <label>Admission Date *</label>
+                {{ form.adm_date }}
+            </div>
+            <div>
+                <label>Session Year *</label>
+                {{ form.session_year }}
+            </div>
+            <div>
+                <label>Class *</label>
+                {{ form.class_name }}
+            </div>
+            <div>
+                <label>Section *</label>
+                {{ form.section }}
+            </div>
+            <div>
+                <label>Roll No</label>
+                {{ form.roll_no }}
+            </div>
+            <div>
+                <label>School Branch *</label>
+                {{ form.school_branch }}
+            </div>
+            <div>
+                <label>Stream (Class 11/12)</label>
+                {{ form.stream }}
+            </div>
+        </div>
+
+        <h3>Personal Details</h3>
+        <div class="d-grid grid-2 form-group">
+            <div>
+                <label>Student Name *</label>
+                {{ form.student_name }}
+            </div>
+            <div>
+                <label>Gender *</label>
+                {{ form.sex }}
+            </div>
+            <div>
+                <label>Date of Birth *</label>
+                {{ form.dob }}
+            </div>
+            <div>
+                <label>Student Photo (4cm x 5cm)</label>
+                {{ form.student_photo }}
+            </div>
+            <div>
+                <label>Student Aadhaar No</label>
+                {{ form.student_aadhaar }}
+            </div>
+            <div>
+                <label>Sibling Student ID</label>
+                {{ form.sibling_st_id }}
+            </div>
+            <div>
+                <label>Father's Name *</label>
+                {{ form.fathers_name }}
+            </div>
+            <div>
+                <label>Father's Aadhaar No</label>
+                {{ form.fathers_aadhaar }}
+            </div>
+            <div>
+                <label>Mother's Name</label>
+                {{ form.mothers_name }}
+            </div>
+            <div>
+                <label>Mother's Aadhaar No</label>
+                {{ form.mothers_aadhaar }}
+            </div>
+        </div>
+
+        <h3>Contact & Address</h3>
+        <div class="d-grid grid-2 form-group">
+            <div>
+                <label>{{ form.contact_1.label }} *</label>
+                {{ form.contact_1 }}
+            </div>
+            <div>
+                <label>{{ form.contact_2.label }}</label>
+                {{ form.contact_2 }}
+            </div>
+            <div>
+                <label>{{ form.contact_3.label }}</label>
+                {{ form.contact_3 }}
+            </div>
+            <div>
+                <label>{{ form.contact_4.label }}</label>
+                {{ form.contact_4 }}
+            </div>
+            <div style="grid-column: span 2;">
+                <label>Address</label>
+                {{ form.address }}
+            </div>
+            <div class="d-grid grid-3" style="grid-column: span 2;">
+                <div>
+                    <label>City</label>
+                    {{ form.city }}
+                </div>
+                <div>
+                    <label>State</label>
+                    {{ form.state }}
+                </div>
+                <div>
+                    <label>PIN Code</label>
+                    {{ form.pin }}
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn">Confirm Admission</button>
+    </form>
+</div>
+{% endblock %}

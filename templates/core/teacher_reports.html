@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load role_tags %}
+
+{% block title %}Report Cards{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2>Class Report Cards</h2>
+        <a href="{% url 'bulk_download_reports' %}" class="btn"
+            style="background: var(--success); color: white;">Download All (Bulk)</a>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <th style="padding: 1rem;">Roll No</th>
+                    <th style="padding: 1rem;">Name</th>
+                    <th style="padding: 1rem;">Admission No</th>
+                    <th style="padding: 1rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 1rem;">{{ student.roll_no|default:"-" }}</td>
+                    <td style="padding: 1rem;">{{ student.student_name }}</td>
+                    <td style="padding: 1rem;">{{ student.st_id }}</td>
+                    <td style="padding: 1rem;">
+                        <a href="{% url 'generate_report' student.st_id %}" class="btn"
+                            style="padding: 6px 12px; font-size: 0.8rem;">Download</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="padding: 2rem; text-align: center;">No students found in your assigned class.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

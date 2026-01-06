@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Co-Scholastic Grades{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Co-Scholastic Grades Entry</h2>
+    {% if class_name and section %}
+    <h3 style="color: var(--text-muted); font-size: 1.1rem;">Class: {{ class_name }}-{{ section }}</h3>
+    {% endif %}
+
+    <div style="background: rgba(108, 93, 211, 0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0; font-size: 0.9rem;">
+        <strong>Legend:</strong><br>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
+            <div>
+                G1 = Work Education<br>
+                G2 = Art Education<br>
+                G3 = Health & Physical Education
+            </div>
+            <div>
+                G4 = Regularity & Punctuality<br>
+                G5 = Sincerity<br>
+                G6 = Behaviour & Values
+            </div>
+        </div>
+    </div>
+
+    {% if formset %}
+    <form method="post">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; min-width: 1000px;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border);">
+                        <th rowspan="2" style="padding: 0.2rem; text-align: left;">Roll No</th>
+                        <th rowspan="2" style="padding: 0.2rem; text-align: left; min-width: 150px;">Name</th>
+                        <th colspan="6" style="padding: 0.2rem; text-align: center; border-left: 1px solid var(--border);">Term 1</th>
+                        <th colspan="6" style="padding: 0.2rem; text-align: center; border-left: 1px solid var(--border);">Term 2</th>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <!-- Term 1 Headers -->
+                        <th style="padding: 0.2rem; text-align: center; border-left: 1px solid var(--border);">G1</th>
+                        <th style="padding: 0.2rem; text-align: center;">G2</th>
+                        <th style="padding: 0.2rem; text-align: center;">G3</th>
+                        <th style="padding: 0.2rem; text-align: center;">G4</th>
+                        <th style="padding: 0.2rem; text-align: center;">G5</th>
+                        <th style="padding: 0.2rem; text-align: center;">G6</th>
+                        
+                        <!-- Term 2 Headers -->
+                        <th style="padding: 0.2rem; text-align: center; border-left: 1px solid var(--border);">G1</th>
+                        <th style="padding: 0.2rem; text-align: center;">G2</th>
+                        <th style="padding: 0.2rem; text-align: center;">G3</th>
+                        <th style="padding: 0.2rem; text-align: center;">G4</th>
+                        <th style="padding: 0.2rem; text-align: center;">G5</th>
+                        <th style="padding: 0.2rem; text-align: center;">G6</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for form in formset %}
+                    <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                        <td style="padding: 0.2rem;">
+                            {{ form.instance.student.roll_no|default:"-" }}
+                            {{ form.id }}
+                        </td>
+                        <td style="padding: 0.2rem;">
+                            {{ form.instance.student.student_name }}
+                        </td>
+                        
+                        <!-- Term 1 Inputs -->
+                        <td style="padding: 0.1rem; text-align: center; border-left: 1px solid var(--border);">{{ form.work_education_t1 }}</td>
+                        <td style="padding: 0.1rem; text-align: center;">{{ form.art_education_t1 }}</td>
+                        <td style="padding: 0.1rem; text-align: center;">{{ form.health_education_t1 }}</td>
+                        <td style="padding: 0.1rem; text-align: center;">{{ form.regularity_t1 }}</td>
+                        <td style="padding: 0.1rem; text-align: center;">{{ form.sincerity_t1 }}</td>
+                        <td style="padding: 0.1rem; text-align: center;">{{ form.behaviour_t1 }}</td>
+
+                        <!-- Term 2 Inputs -->
+                        <td style="padding: 0.1rem; text-align: center; border-left: 1px solid var(--border);">{{ form.work_education_t2 }}</td>
+                        <td style="padding: 0.1rem; text-align: center;">{{ form.art_education_t2 }}</td>
+                        <td style="padding: 0.1rem; text-align: center;">{{ form.health_education_t2 }}</td>
+                        <td style="padding: 0.1rem; text-align: center;">{{ form.regularity_t2 }}</td>
+                        <td style="padding: 0.1rem; text-align: center;">{{ form.sincerity_t2 }}</td>
+                        <td style="padding: 0.1rem; text-align: center;">{{ form.behaviour_t2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-top: 2rem; text-align: right;">
+            <a href="{% url 'marks_entry' %}{% if class_name and section %}?class_name={{ class_name }}&section={{ section }}{% endif %}" class="btn" style="background: transparent; color: var(--text-color); margin-right: 1rem;">Back to Marks</a>
+            <button type="submit" class="btn">Save All Grades</button>
+        </div>
+    </form>
+    {% else %}
+    <p class="mt-4">Please select a class and section to view students.</p>
+        {% if not is_teacher %}
+        <form method="get">
+            <!-- Simple manual selector for admin if came directly -->
+            <input type="text" name="class_name" placeholder="Class" required>
+            <input type="text" name="section" placeholder="Section" required>
+            <button type="submit">Load</button>
+        </form>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

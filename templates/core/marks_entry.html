@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load role_tags %}
+
+{% block title %}Marks Entry{% endblock %}
+
+{% block content %}
+<div class="card">
+    {% if request.user|is_teacher %}
+        <h2>Subject and Activity-wise Marks And Grade Entry For Class {{ request.user.teacher_profile.assigned_class }}-{{ request.user.teacher_profile.assigned_section }}</h2>
+        <form method="get" class="d-grid mt-4" style="align-items: end; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <!-- Hidden inputs to satisfy form validation if required, though view ignores them for teachers -->
+            <div style="display: none;">
+                {{ form.class_name }}
+                {{ form.section }}
+            </div>
+            <div>
+                <label>Subject</label>
+                {{ form.subject }}
+            </div>
+            <div>
+                <label>Term</label>
+                {{ form.term }}
+            </div>
+            <div>
+                <button type="submit" class="btn">Load Students</button>
+                <a href="{% url 'co_scholastic_entry' %}" class="btn" style="background: var(--secondary); margin-left: 0.5rem; text-decoration: none; padding: 0.6rem 1rem;">Co-Scholastic Grades</a>
+            </div>
+        </form>
+    {% else %}
+        <h2>Subject-wise Marks Entry</h2>
+        <form method="get" class="d-grid mt-4" style="align-items: end; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+            <div>
+                <label>Class</label>
+                {{ form.class_name }}
+            </div>
+            <div>
+                <label>Section</label>
+                {{ form.section }}
+            </div>
+            <div>
+                <label>Subject</label>
+                {{ form.subject }}
+            </div>
+            <div>
+                <label>Term</label>
+                {{ form.term }}
+            </div>
+            <div>
+                <button type="submit" class="btn">Load Students</button>
+            </div>
+        </form>
+    {% endif %}
+</div>
+
+{% if formset %}
+<div class="card mt-4">
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="submit_marks" value="1">
+        {{ formset.management_form }}
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+            <thead>
+                <tr style="text-align: left; border-bottom: 1px solid var(--border);">
+                    <th style="padding: 1rem;">Roll No</th>
+                    <th style="padding: 1rem;">Student Name</th>
+                    <th style="padding: 1rem;">PT (40)</th>
+                    <th style="padding: 1rem;">NB (5)</th>
+                    <th style="padding: 1rem;">SE (5)</th>
+                    <th style="padding: 1rem;">Exam (80)</th>
+                    <th style="padding: 1rem;">Attendance (Days Present)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in formset %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 0.5rem 1rem;">
+                        {{ form.instance.student.roll_no|default:"-" }}
+                        {{ form.id }} <!-- Hidden ID field -->
+                    </td>
+                    <td style="padding: 0.5rem 1rem;">
+                        {{ form.instance.student.student_name }}
+                    </td>
+                    <td style="padding: 0.5rem;">{{ form.periodic_test }}</td>
+                    <td style="padding: 0.5rem;">{{ form.notebook }}</td>
+                    <td style="padding: 0.5rem;">{{ form.subject_enrichment }}</td>
+                    <td style="padding: 0.5rem;">{{ form.exam_marks }}</td>
+                    <td style="padding: 0.5rem;">
+                        <!-- Attendance -->
+                        <div style="margin-bottom: 5px;">
+                            <input type="number" name="attendance_{{ form.instance.student.st_id }}"
+                                value="{{ form.instance.student.days_present|default:0 }}" class="form-control"
+                                style="width: 80px; display: inline-block;" min="0"
+                                max="{{ form.instance.student.total_days|default:365 }}">
+                            <span class="text-muted">/ {{ form.instance.student.total_days|default:"0" }}</span>
+                        </div>
+                        <!-- Promotion Status -->
+                        <div>
+                            <select name="promotion_status_{{ form.instance.student.st_id }}" class="form-control" style="width: 100%;">
+                                <option value="">-- Status --</option>
+                                <option value="Promoted" {% if not form.instance.student.promotion_status or form.instance.student.promotion_status == 'Promoted' %}selected{% endif %} style="color: green;">Promoted</option>
+                                <option value="Detained" {% if form.instance.student.promotion_status == 'Detained' %}selected{% endif %} style="color: red;">Detained</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+                {% if form.errors %}
+                <tr>
+                    <td colspan="7" style="color: red; padding-left: 1rem;">{{ form.errors }}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="margin-top: 2rem; text-align: right;">
+            <button type="submit" class="btn">Save All Marks</button>
+        </div>
+    </form>
+</div>
+{% endif %}
+{% endblock %}

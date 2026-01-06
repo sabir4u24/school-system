@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load role_tags %}
+
+{% block title %}Manage Teachers{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2>Staff Directory (Teachers)</h2>
+        <a href="{% url 'teacher_add' %}" class="btn">Add New Teacher</a>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <th style="padding: 1rem;">Name (User)</th>
+                    <th style="padding: 1rem;">Branch</th>
+                    <th style="padding: 1rem;">Assigned Class</th>
+                    <th style="padding: 1rem;">Qualification</th>
+                    <th style="padding: 1rem;">Designation</th>
+                    <th style="padding: 1rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for teacher in teachers %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 1rem;">{{ teacher.user.username }}</td>
+                    <td style="padding: 1rem;">{{ teacher.school_branch|default:"-" }}</td>
+                    <td style="padding: 1rem;">{{ teacher.assigned_class }} - {{ teacher.assigned_section }}</td>
+                    <td style="padding: 1rem;">{{ teacher.qualification }}</td>
+                    <td style="padding: 1rem;">{{ teacher.designation }}</td>
+                    <td style="padding: 1rem;">
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{% url 'teacher_edit' teacher.id %}" class="btn"
+                                style="padding: 6px 12px; font-size: 0.8rem; background: rgba(0, 255, 0, 0.1); color: #0f0; border: 1px solid #0f0;">Edit</a>
+                            <a href="{% url 'teacher_delete' teacher.id %}" class="btn"
+                                style="padding: 6px 12px; font-size: 0.8rem; background: rgba(255, 0, 0, 0.1); color: #f00; border: 1px solid #f00;"
+                                onclick="return confirm('Are you sure you want to delete this teacher? This will delete their user account and cannot be undone.');">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="padding: 2rem; text-align: center;">No teachers found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Student{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
+    <div class="card" style="width: 100%; max-width: 800px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2>Edit Student: {{ student.st_id }}</h2>
+            <a href="{% url 'student_detail' student.st_id %}"
+                style="color: var(--text-muted); text-decoration: none;">Cancel</a>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                <!-- Reusing the form rendering logic from admission could be better, but simple loop works -->
+                {% for field in form %}
+                <div class="form-group">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                    <small style="color: #ff6b6b;">{{ field.errors.0 }}</small>
+                    {% endif %}
+                    {% if field.help_text %}
+                    <small style="color: var(--text-muted);">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1rem; text-align: right;">
+                <button type="submit" class="btn" style="width: 200px;">Update Student</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

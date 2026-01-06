@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Teacher{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
+    <div class="card" style="width: 100%; max-width: 600px;">
+        <h2 style="margin-bottom: 1.5rem;">{{ action }} Teacher</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if action == 'Add' %}
+            <div class="form-group">
+                <label>Username (Required)</label>
+                <input type="text" name="username" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Password (Required)</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+            {% else %}
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" class="form-control" value="{{ profile.user.username }}" required>
+            </div>
+            <div class="form-group">
+                <label>New Password (Optional)</label>
+                <input type="password" name="password" class="form-control" placeholder="Leave blank to keep unchanged">
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label>School Branch (Required)</label>
+                <select name="school_branch" class="form-control" required>
+                    <option value="">Select Branch...</option>
+                    {% for branch in available_branches %}
+                    <option value="{{ branch.name }}" {% if profile and profile.school_branch == branch.name %}selected{% endif %}>
+                        {{ branch.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Assigned Class</label>
+                    <select name="assigned_class" class="form-control" required>
+                        <option value="">Select...</option>
+                        <option value="1" {% if profile and profile.assigned_class == '1' %}selected{% endif %}>1</option>
+                        <option value="2" {% if profile and profile.assigned_class == '2' %}selected{% endif %}>2</option>
+                        <option value="3" {% if profile and profile.assigned_class == '3' %}selected{% endif %}>3</option>
+                        <option value="4" {% if profile and profile.assigned_class == '4' %}selected{% endif %}>4</option>
+                        <option value="5" {% if profile and profile.assigned_class == '5' %}selected{% endif %}>5</option>
+                        <option value="6" {% if profile and profile.assigned_class == '6' %}selected{% endif %}>6</option>
+                        <option value="7" {% if profile and profile.assigned_class == '7' %}selected{% endif %}>7</option>
+                        <option value="8" {% if profile and profile.assigned_class == '8' %}selected{% endif %}>8</option>
+                        <option value="9" {% if profile and profile.assigned_class == '9' %}selected{% endif %}>9</option>
+                        <option value="10" {% if profile and profile.assigned_class == '10' %}selected{% endif %}>10
+                        </option>
+                        <option value="11" {% if profile and profile.assigned_class == '11' %}selected{% endif %}>11
+                        </option>
+                        <option value="12" {% if profile and profile.assigned_class == '12' %}selected{% endif %}>12
+                        </option>
+                        <option value="KG" {% if profile and profile.assigned_class == 'KG' %}selected{% endif %}>KG
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Section</label>
+                    <select name="assigned_section" class="form-control" required>
+                        <option value="A" {% if profile and profile.assigned_section == 'A' %}selected{% endif %}>A
+                        </option>
+                        <option value="B" {% if profile and profile.assigned_section == 'B' %}selected{% endif %}>B
+                        </option>
+                        <option value="C" {% if profile and profile.assigned_section == 'C' %}selected{% endif %}>C
+                        </option>
+                        <option value="D" {% if profile and profile.assigned_section == 'D' %}selected{% endif %}>D
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Qualification</label>
+                <input type="text" name="qualification" class="form-control"
+                    value="{{ profile.qualification|default:'' }}">
+            </div>
+            <div class="form-group">
+                <label>Designation</label>
+                <input type="text" name="designation" class="form-control" value="{{ profile.designation|default:'' }}">
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <button type="submit" class="btn">Save Teacher</button>
+                <a href="{% url 'manage_teachers' %}" class="btn" style="background: transparent;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

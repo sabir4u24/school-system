@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Promotion{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Promote Students</h2>
+    <p class="text-muted">Select students to promote to the next academic session.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="d-grid grid-2 mb-4">
+            <div>
+                <label>Target Session Year</label>
+                <!-- Existing text input replaced with select as per requirements -->
+                <select name="target_session" required style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    <option value="" disabled selected>Select Target Session</option>
+                    {% for session in sessions %}
+                    <option value="{{ session.name }}" {% if session.is_current %}selected{% endif %}>{{ session.name }}
+                    </option>
+                    {% empty %}
+                    <!-- Fallback if no sessions created yet, though admin should create them -->
+                    <option value="2026-2027">2026-2027</option>
+                    <option value="2025-2026">2025-2026</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+            <thead>
+                <tr style="text-align: left; border-bottom: 1px solid var(--border);">
+                    <th style="padding: 1rem;"><input type="checkbox" onclick="toggle(this)"></th>
+                    <th style="padding: 1rem;">ID</th>
+                    <th style="padding: 1rem;">Name</th>
+                    <th style="padding: 1rem;">Current Class</th>
+                    <th style="padding: 1rem;">Overall Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 1rem;">
+                        <input type="checkbox" name="student_ids" value="{{ student.st_id }}">
+                    </td>
+                    <td style="padding: 1rem;">{{ student.st_id }}</td>
+                    <td style="padding: 1rem;">{{ student.student_name }}</td>
+                    <td style="padding: 1rem;">{{ student.class_name }} - {{ student.section }}</td>
+                    <td style="padding: 1rem;">
+                        {% if student.calculated_grade %}
+                        {% if student.calculated_grade == 'E' %}
+                        <span style="font-weight: bold; color: #F44336;">
+                            {{ student.calculated_grade }}
+                        </span>
+                        {% else %}
+                        <span style="font-weight: bold; color: #4CAF50;">
+                            {{ student.calculated_grade }}
+                        </span>
+                        {% endif %}
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="padding: 1rem;">No students found in your assigned class.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="margin-top: 2rem;">
+            <button type="submit" class="btn">Promote Selected Students</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function toggle(source) {
+        checkboxes = document.getElementsByName('student_ids');
+        for (var i = 0, n = checkboxes.length; i < n; i++) {
+            checkboxes[i].checked = source.checked;
+        }
+    }
+</script>
+{% endblock %}

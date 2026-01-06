@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load role_tags %}
+
+{% block title %}Student Details{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: start;">
+        <div>
+            <h2>{{ student.student_name }}</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Student ID: {{ student.st_id }}</p>
+        </div>
+
+        {% if student.student_photo %}
+        <img src="{{ student.student_photo.url }}" alt="Photo"
+            style="width: 120px; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border);">
+        {% endif %}
+    </div>
+
+    <div class="d-grid grid-2" style="gap: 2rem;">
+        <div>
+            <h4 style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 1rem;">Academic
+                Details</h4>
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0 0.5rem;">
+                <tr>
+                    <td style="color: var(--text-muted); width: 120px;">Class/Sec:</td>
+                    <td>{{ student.class_name }} - {{ student.section }}</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">Stream:</td>
+                    <td>{{ student.get_stream_display }}</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">Roll No:</td>
+                    <td>{{ student.roll_no|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">Session:</td>
+                    <td>{{ student.session_year }}</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">Adm Date:</td>
+                    <td>{{ student.adm_date }}</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">CBSE Reg:</td>
+                    <td>{{ student.cbse_reg|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">School Branch:</td>
+                    <td>{{ student.school_branch }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div>
+            <h4 style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 1rem;">Personal
+                Details</h4>
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0 0.5rem;">
+                <tr>
+                    <td style="color: var(--text-muted); width: 120px;">Father:</td>
+                    <td>{{ student.fathers_name }}</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">Father Aadhaar:</td>
+                    <td>{{ student.fathers_aadhaar|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">Mother:</td>
+                    <td>{{ student.mothers_name }}</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">Mother Aadhaar:</td>
+                    <td>{{ student.mothers_aadhaar|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">DOB:</td>
+                    <td>{{ student.dob }}</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">Gender:</td>
+                    <td>{{ student.get_sex_display }}</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">Aadhaar:</td>
+                    <td>{{ student.student_aadhaar|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">Sibling ID:</td>
+                    <td>{% if student.sibling_st_id %}<a href="{% url 'student_detail' student.sibling_st_id %}">{{
+                            student.sibling_st_id }}</a>{% else %}-{% endif %}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div style="margin-top: 2rem;">
+        <h4 style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 1rem;">Contact &
+            Address</h4>
+        <div class="d-grid grid-2">
+            <div>
+                <p style="margin: 0.5rem 0"><span style="color: var(--text-muted);">Primary 1:</span>
+                    {{ student.contact_1 }}</p>
+                <p style="margin: 0.5rem 0"><span style="color: var(--text-muted);">Primary 2:</span>
+                    {{ student.contact_2|default:"-" }}</p>
+            </div>
+            <div>
+                <p style="margin: 0.5rem 0"><span style="color: var(--text-muted);">Secondary 1:</span>
+                    {{ student.contact_3|default:"-" }}</p>
+                <p style="margin: 0.5rem 0"><span style="color: var(--text-muted);">Secondary 2:</span>
+                    {{ student.contact_4|default:"-" }}</p>
+            </div>
+        </div>
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05);">
+            <p>{{ student.address }}</p>
+            <p>{{ student.city|default:"" }}{% if student.state %}, {{ student.state }}{% endif %} {% if student.pin %}-
+                {{ student.pin }}{% endif %}</p>
+        </div>
+    </div>
+
+    <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+        {% if request.user.is_superuser or request.user|is_staff %}
+        <a href="{% url 'student_edit' student.st_id %}" class="btn">Edit Details</a>
+        {% endif %}
+        <a href="{% url 'generate_report' student.st_id %}" target="_blank" class="btn"
+            style="background: transparent; border: 1px solid var(--primary); color: var(--primary);">View Report
+            Card</a>
+        <a href="{% url 'student_list' %}" class="btn"
+            style="background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); margin-left: auto;">Back
+            to List</a>
+    </div>
+</div>
+{% endblock %}

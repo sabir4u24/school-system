@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load role_tags %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}School System{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6C5DD3;
+            --primary-hover: #5b4cc4;
+            --secondary: #FF754C;
+            --bg-dark: #1F2128;
+            --bg-card: #242731;
+            --text-main: #FFFFFF;
+            --text-muted: #808191;
+            --border: #2D2F39;
+            --glass: rgba(36, 39, 49, 0.7);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* Layout */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-card);
+            padding: 2rem;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Typography */
+        h1,
+        h2,
+        h3 {
+            margin: 0 0 1rem 0;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Navigation */
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 14px rgba(108, 93, 211, 0.4);
+        }
+
+        /* Cards/Forms */
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+            /* Fix width overflow */
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(108, 93, 211, 0.4);
+        }
+
+        /* Utility */
+        .d-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .mt-4 {
+            margin-top: 2rem;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: auto;
+                padding: 1rem;
+            }
+
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="brand">🚀 Holy Brook School</div>
+
+            {% if request.user.is_authenticated %}
+            <div style="margin-bottom: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                <div style="font-weight: 600;">{{ request.user.username }}</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">
+                    {% if request.user.is_superuser %} Administrator
+                    {% elif request.user|is_teacher %} Teacher
+                    {% elif request.user|is_staff %} Office Staff
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <nav>
+                <a href="{% url 'home' %}" class="nav-link">Dashboard</a>
+
+                {% if request.user|is_staff or request.user.is_superuser %}
+                <a href="{% url 'admission' %}" class="nav-link">Admission</a>
+                {% endif %}
+
+                {% if request.user|is_staff or request.user.is_superuser or request.user|is_teacher %}
+                <a href="{% url 'student_list' %}" class="nav-link">Students List</a>
+                {% endif %}
+
+                {% if request.user|is_staff or request.user.is_superuser %}
+                <a href="{% url 'manage_teachers' %}" class="nav-link">Manage Teachers</a>
+                {% endif %}
+
+                {% if request.user|is_teacher %}
+                <a href="{% url 'marks_entry' %}" class="nav-link">Marks Entry</a>
+                <a href="{% url 'promotion' %}" class="nav-link">Promotion</a>
+                <a href="{% url 'teacher_reports' %}" class="nav-link">Report Cards</a>
+                {% endif %}
+
+                {% if request.user.is_superuser %}
+                <a href="/admin/" target="_blank" class="nav-link">Admin Panel</a>
+                <a href="{% url 'manage_branches' %}" class="nav-link">Branches</a>
+                {% endif %}
+
+                <form action="{% url 'logout' %}" method="post" style="margin-top: auto;">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-link"
+                        style="background: none; border: none; width: 100%; cursor: pointer;">Logout</button>
+                </form>
+            </nav>
+        </aside>
+        <main class="main-content">
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div
+                    style="background: rgba(108, 93, 211, 0.2); padding: 1rem; border-radius: 12px; margin-bottom: 1rem; border: 1px solid var(--primary);">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load role_tags %}
+
+{% block title %}Student List{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 style="margin: 0;">{% if request.user|is_teacher %}My Students{% else %}Registered Students{% endif %}</h2>
+            
+            {% if request.user.is_superuser or request.user|is_staff %}
+            <a href="{% url 'admission' %}" class="btn">Add New Student</a>
+            {% endif %}
+        </div>
+
+        <div class="card" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); padding: 1rem; margin-bottom: 1rem;">
+            <form method="get" action="{% url 'student_list' %}" style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
+                
+                <!-- Search -->
+                <div style="flex: 1; min-width: 200px;">
+                    <label style="display: block; font-size: 0.8rem; margin-bottom: 0.2rem;">Search</label>
+                    <input type="text" name="q" placeholder="Name, ID, Father's Name..." value="{{ query|default:'' }}" class="form-control" style="width: 100%;">
+                </div>
+
+                <!-- Filters -->
+                <div style="min-width: 120px;">
+                    <label style="display: block; font-size: 0.8rem; margin-bottom: 0.2rem;">Class</label>
+                    <select name="class_name" class="form-control" style="width: 100%;">
+                        <option value="">All</option>
+                        {% for c_code, c_name in class_choices %}
+                        <option value="{{ c_code }}" {% if selected_class == c_code %}selected{% endif %}>{{ c_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div style="min-width: 80px;">
+                    <label style="display: block; font-size: 0.8rem; margin-bottom: 0.2rem;">Section</label>
+                    <select name="section" class="form-control" style="width: 100%;">
+                        <option value="">All</option>
+                        {% for s_code, s_name in section_choices %}
+                        <option value="{{ s_code }}" {% if selected_section == s_code %}selected{% endif %}>{{ s_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div style="min-width: 120px;">
+                    <label style="display: block; font-size: 0.8rem; margin-bottom: 0.2rem;">Stream</label>
+                    <select name="stream" class="form-control" style="width: 100%;">
+                        <option value="">All</option>
+                        {% for st_code, st_name in stream_choices %}
+                        <option value="{{ st_code }}" {% if selected_stream == st_code %}selected{% endif %}>{{ st_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {% if not request.user|is_teacher %}
+                <div style="min-width: 150px;">
+                    <label style="display: block; font-size: 0.8rem; margin-bottom: 0.2rem;">Branch</label>
+                    <select name="branch" class="form-control" style="width: 100%;">
+                        <option value="">All</option>
+                        {% for branch in branch_choices %}
+                        <option value="{{ branch.name }}" {% if selected_branch == branch.name %}selected{% endif %}>{{ branch.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+
+                <div style="display: flex; gap: 0.5rem;">
+                    <button type="submit" class="btn" style="height: 46px; background-color: rgb(5, 136, 75);">Filter</button>
+                    <button type="button" class="btn" style="height: 46px; background-color: rgb(61, 99, 17);"><a href="{% url 'student_list' %}" style="text-decoration: none; color: white;" >Reset</a></button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Export Actions -->
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-bottom: 1rem;">
+            <a href="{% url 'export_students_csv' %}?{{ request.GET.urlencode }}" class="btn" target="_blank" style="background: #217346;">
+                Export to Excel
+            </a>
+            <a href="{% url 'export_students_pdf' %}?{{ request.GET.urlencode }}" class="btn" target="_blank" style="background: #b30b00;">
+                Export to PDF
+            </a>
+            {% if request.user|is_teacher or request.user.is_superuser %}
+            <button type="submit" form="bulkAssignForm" class="btn" style="background: var(--primary);">
+                Assign Subjects
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <form method="post" action="{% url 'bulk_assign_subjects_selection' %}" id="bulkAssignForm">
+        {% csrf_token %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        {% if request.user|is_teacher or request.user.is_superuser %}
+                        <th style="padding: 1rem; width: 40px;">
+                            <input type="checkbox" id="selectAll" style="cursor: pointer;">
+                        </th>
+                        {% endif %}
+                        <th style="padding: 1rem;">Student ID</th>
+                        <th style="padding: 1rem;">Name</th>
+                        <th style="padding: 1rem;">Stream</th>
+                        {% if not request.user|is_teacher %}
+                        <th style="padding: 1rem;">Branch</th>
+                        {% endif %}
+                        <th style="padding: 1rem;">Class</th>
+                        <th style="padding: 1rem;">Section</th>
+                        <th style="padding: 1rem;">Roll No</th>
+                        <th style="padding: 1rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        {% if request.user|is_teacher or request.user.is_superuser %}
+                        <td style="padding: 1rem;">
+                            <input type="checkbox" name="selected_students" value="{{ student.st_id }}"
+                                class="student-checkbox" style="cursor: pointer;">
+                        </td>
+                        {% endif %}
+                        <td style="padding: 1rem;">{{ student.st_id }}</td>
+                        <td style="padding: 1rem;">{{ student.student_name }}</td>
+                        <td style="padding: 1rem;">
+                            {% if student.class_name == '11' or student.class_name == '12' %}
+                            {{ student.stream }}
+                            {% else %}
+                            None
+                            {% endif %}
+                        </td>
+                        {% if not request.user|is_teacher %}
+                        <td style="padding: 1rem;">{{ student.school_branch }}</td>
+                        {% endif %}
+                        <td style="padding: 1rem;">{{ student.class_name }}</td>
+                        <td style="padding: 1rem;">{{ student.section }}</td>
+                        <td style="padding: 1rem;">{{ student.roll_no|default:"-" }}</td>
+                        <td style="padding: 1rem;">
+                            {% if request.user.is_superuser or request.user|is_staff or request.user|is_teacher %}
+                            <a href="{% url 'student_detail' student.st_id %}" class="btn"
+                                style="padding: 6px 12px; font-size: 0.8rem; background: var(--secondary); color: white;">View</a>
+                            <a href="{% url 'student_edit' student.st_id %}" class="btn"
+                                style="padding: 6px 12px; font-size: 0.8rem; background: transparent; border: 1px solid var(--text-color);">Edit</a>
+                            {% endif %}
+
+                            {% if request.user.is_superuser or request.user|is_staff or request.user|is_teacher %}
+                            <a href="{% url 'assign_subjects' student.st_id %}" class="btn"
+                                style="padding: 6px 12px; font-size: 0.8rem; background: transparent; border: 1px solid var(--primary); color: var(--primary);">Subjects</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="{% if request.user|is_teacher %}9{% else %}7{% endif %}"
+                            style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                            No students found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.student-checkbox');
+
+        if (selectAll) {
+            selectAll.addEventListener('change', function () {
+                checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            });
+        }
+    });
+</script>
+{% endblock %}

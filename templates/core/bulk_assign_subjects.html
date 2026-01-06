@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Bulk Assign Subjects{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
+    <div class="card" style="width: 100%; max-width: 800px;">
+        <h2 style="margin-bottom: 1rem;">Bulk Assign Subjects</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">
+            Assigning subjects to <strong>{{ students.count }}</strong> students in Class <strong>{{ class_name
+                }}</strong>.
+        </p>
+
+        {% if is_elective_class %}
+        <div
+            style="background: rgba(108, 93, 211, 0.2); padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--primary);">
+            <strong>Note:</strong> For Class {{ class_name }}, please select exactly {{ max_subjects }} subjects.
+        </div>
+        {% endif %}
+
+        <div
+            style="margin-bottom: 2rem; max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+            <p style="margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Selected Students:</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                {% for student in students %}
+                <span
+                    style="background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">
+                    {{ student.student_name }}
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <form method="post" action="{% url 'bulk_assign_subjects_save' %}">
+            {% csrf_token %}
+            <input type="hidden" name="student_ids" value="{{ student_ids }}">
+
+            <div style="margin-bottom: 2rem;">
+                <label style="display: block; margin-bottom: 1rem; font-weight: 600;">
+                    Available Subjects {% if is_elective_class %}(Select {{ max_subjects }}){% endif %}:
+                </label>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
+                    {% for subject in available_subjects %}
+                    <label
+                        style="display: flex; align-items: center; padding: 0.75rem; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" name="subjects" value="{{ subject.id }}"
+                            style="margin-right: 0.5rem; width: 18px; height: 18px;">
+                        <span>{{ subject.name }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                <button type="submit" class="btn">Confirm Assignment</button>
+                <a href="{% url 'student_list' %}" class="btn"
+                    style="background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted);">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if is_elective_class %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var checkboxes = document.querySelectorAll('input[name="subjects"]');
+        var maxSubjects = parseInt("{{ max_subjects }}");
+
+        checkboxes.forEach(function (checkbox) {
+            checkbox.addEventListener('change', function () {
+                var checkedCount = document.querySelectorAll('input[name="subjects"]:checked').length;
+
+                if (checkedCount >= maxSubjects) {
+                    checkboxes.forEach(function (cb) {
+                        if (!cb.checked) {
+                            cb.disabled = true;
+                            cb.parentElement.style.opacity = '0.5';
+                        }
+                    });
+                } else {
+                    checkboxes.forEach(function (cb) {
+                        cb.disabled = false;
+                        cb.parentElement.style.opacity = '1';
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

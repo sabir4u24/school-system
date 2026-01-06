@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Subjects{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
+    <div class="card" style="width: 100%; max-width: 700px;">
+        <h2 style="margin-bottom: 1rem;">Assign Subjects</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">
+            Student: <strong>{{ student.student_name }}</strong> ({{ student.st_id }}) - Class {{ student.class_name }}
+        </p>
+
+        {% if is_elective_class %}
+        <div
+            style="background: rgba(108, 93, 211, 0.2); padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--primary);">
+            <strong>Note:</strong> For Class {{ student.class_name }}, please select exactly {{ max_subjects }} subjects
+            from the available options.
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div style="margin-bottom: 2rem;">
+                <label style="display: block; margin-bottom: 1rem; font-weight: 600;">
+                    Available Subjects {% if is_elective_class %}(Select {{ max_subjects }}){% endif %}:
+                </label>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
+                    {% for subject in available_subjects %}
+                    <label
+                        style="display: flex; align-items: center; padding: 0.75rem; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" name="subjects" value="{{ subject.id }}" {% if subject.id in current_subjects %}checked{% endif %} style="margin-right: 0.5rem; width: 18px; height: 18px;">
+                        <span>{{ subject.name }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                <button type="submit" class="btn">Save Subjects</button>
+                <a href="{% url 'student_list' %}" class="btn"
+                    style="background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted);">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if is_elective_class %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var checkboxes = document.querySelectorAll('input[name="subjects"]');
+        var maxSubjects = parseInt("{{ max_subjects }}");
+
+        checkboxes.forEach(function (checkbox) {
+            checkbox.addEventListener('change', function () {
+                var checkedCount = document.querySelectorAll('input[name="subjects"]:checked').length;
+
+                if (checkedCount >= maxSubjects) {
+                    checkboxes.forEach(function (cb) {
+                        if (!cb.checked) {
+                            cb.disabled = true;
+                            cb.parentElement.style.opacity = '0.5';
+                        }
+                    });
+                } else {
+                    checkboxes.forEach(function (cb) {
+                        cb.disabled = false;
+                        cb.parentElement.style.opacity = '1';
+                    });
+                }
+            });
+        });
+
+        // Initial check
+        if (checkboxes.length > 0) {
+            var event = new Event('change');
+            checkboxes[0].dispatchEvent(event);
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load role_tags %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Welcome to School Management System</h2>
+    <div class="d-grid grid-3 mt-4">
+        {% if request.user|is_teacher %}
+        <div
+            style="background: rgba(108, 93, 211, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--primary);">
+            <h3 style="color: var(--primary)">My Class</h3>
+            <p style="font-size: 1.5rem; font-weight: 700; margin: 0;">{{ assigned_class }}</p>
+            <p style="color: var(--text-muted)">{{ my_students_count }} Students</p>
+        </div>
+        {% else %}
+        <div
+            style="background: rgba(108, 93, 211, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--primary);">
+            <h3 style="color: var(--primary)">Student Management</h3>
+            <p style="font-size: 2rem; font-weight: 700; margin: 0;">{{ total_students }} Students</p>
+            
+            <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <!-- CSV Actions -->
+                <div style="display: flex; gap: 0.5rem;">
+                    <a href="{% url 'download_student_csv_template' %}" class="btn" style="flex: 1; font-size: 0.8rem; background: var(--secondary);">Download CSV Template</a>
+                    <button onclick="document.getElementById('csvUploadModal').style.display='flex'" class="btn" style="flex: 1; font-size: 0.8rem;">Upload CSV</button>
+                </div>
+                
+                {% if request.user.is_superuser %}
+                <!-- DB Actions -->
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 0.5rem;">
+                    <a href="{% url 'database_backup' %}" class="btn" style="flex: 1; font-size: 0.8rem; background: #217346;">Backup DB</a>
+                    <button onclick="document.getElementById('dbRestoreModal').style.display='flex'" class="btn" style="flex: 1; font-size: 0.8rem; background: #b30b00;">Restore DB</button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        <!-- Add more stats here later -->
+    </div>
+
+    <!-- Upload CSV Modal -->
+    <div id="csvUploadModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div class="card" style="width: 400px; max-width: 90%;">
+            <h3>Upload Student CSV</h3>
+            <p>Upload a filled CSV file to add students in bulk.</p>
+            <form method="post" action="{% url 'upload_student_csv' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" name="csv_file" accept=".csv" required class="form-control" style="margin: 1rem 0;">
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                    <button type="button" onclick="document.getElementById('csvUploadModal').style.display='none'" class="btn" style="background: transparent; color: var(--text-color);">Cancel</button>
+                    <button type="submit" class="btn">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Restore DB Modal -->
+    <div id="dbRestoreModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div class="card" style="width: 400px; max-width: 90%;">
+            <h3 style="color: #b30b00;">Restore Database</h3>
+            <p style="color: #b30b00;"><strong>WARNING:</strong> This will overwrite all current data!</p>
+            <form method="post" action="{% url 'database_restore' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" name="sql_file" accept=".sql" required class="form-control" style="margin: 1rem 0;">
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                    <button type="button" onclick="document.getElementById('dbRestoreModal').style.display='none'" class="btn" style="background: transparent; color: var(--text-color);">Cancel</button>
+                    <button type="submit" class="btn" style="background: #b30b00;">Restore</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if request.user|is_teacher %}
+    <div class="mt-5 card" style="border-top: 1px solid #eee; padding-top: 1.5rem;">
+        <h3 style="color: var(--primary); margin-bottom: 1rem;">Attendance Settings</h3>
+        <div style="padding: 1.5rem; border-radius: 12px; border: 1px solid #e5e7eb; max-width: 500px;">
+            <p><strong>Current Total School Days:</strong> {{ current_total_days|default:"0" }}</p>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    {{ attendance_form.total_days.label_tag }}
+                    {{ attendance_form.total_days }}
+                    <small class="text-muted">{{ attendance_form.total_days.help_text }}</small>
+                </div>
+                <button type="submit" name="set_attendance" class="btn btn-primary">Update Total Days for All
+                    Students</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

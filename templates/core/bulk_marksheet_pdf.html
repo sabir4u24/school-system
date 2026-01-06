@@ -1,0 +1,459 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+
+        body {
+            font-family: Helvetica, sans-serif;
+            color: #000;
+            font-size: 10px;
+        }
+
+
+        .img-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            margin-top: -50px;
+            margin-bottom: 10px;
+        }
+
+        .img {
+            width: 120%;
+            height: auto;
+            max-width: none;
+            object-fit: contain;
+        }
+
+        .sign-container {
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+            position: absolute;
+            bottom: 25px;
+            right: 30px;
+            width: auto;
+            margin: 0;
+        }
+
+        .sign {
+            width: 150px;
+            height: auto;
+            object-fit: contain;
+        }
+
+
+        .sub-header {
+            text-align: center;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 11px;
+            padding: 5px 5px 3px 5px;
+            background-color: blue;
+            color: #f5f5f5;
+        }
+
+        .remarks-table {
+            width: 100%;
+            margin-bottom: 15px;
+            margin-top: 20px;
+            font-size: 11px;
+            padding: 5px 5px 3px 5px;
+            background-color: blue;
+            color: #f5f5f5;
+        }
+
+        .profile-table td {
+            padding: 3px;
+            line-height: 1.2;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+
+        /* Marks Table */
+        .marks-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .marks-table2 {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9px;
+            margin-bottom: 15px;
+            text-align: center;
+            background-color: #fcd453;
+        }
+
+        .marks-table th,
+        .marks-table td {
+            border: 1px solid #000;
+            padding: 4px 2px;
+        }
+
+        .marks-table th {
+            font-weight: bold;
+            background-color: #e6cef7;
+        }
+
+        .marks-table2 th {
+            border: 1px solid #000;
+            padding: 5px 5px 3px 5px;
+            font-weight: bold;
+            background-color: #fdfa4d;
+        }
+
+        .inner-table th {
+            font-weight: bold;
+            background-color: #e6cef7;
+        }
+
+        .text-left {
+            text-align: left !important;
+            padding-left: 5px !important;
+        }
+
+        /* Co-Scholastic & Discipline Wrapper */
+        .side-by-side-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .side-by-side-table td {
+            vertical-align: top;
+            padding: 0;
+            border: none;
+        }
+
+        .inner-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9px;
+        }
+
+        .inner-table th,
+        .inner-table td {
+            border: 1px solid #000;
+            padding: 4px;
+            text-align: center;
+        }
+
+        /* Grading Scale */
+        .grading-scale {
+            margin-top: 5px;
+            margin-bottom: 15px;
+            font-size: 8px;
+            text-align: center;
+        }
+
+        .signatures {
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        .signatures td {
+            text-align: center;
+            font-weight: bold;
+            font-size: 10px;
+            padding-top: 30px;
+            border-top: 1px solid #000;
+            width: 30%;
+        }
+
+        .signatures .spacer {
+            border: none;
+            width: 5%;
+        }
+
+        .no-border-top {
+            border-top: none !important;
+        }
+
+        .student-photo {
+            width: 80px;
+            height: 100px;
+            max-height: 100px;
+            object-fit: cover;
+            border: 2px solid #000;
+            display: block;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+
+<body>
+    {% for report in reports %}
+    <div class="img-container">
+        <img src="{% static 'images/cardheader.png' %}" class="img" alt="Header">
+    </div>
+
+    <div class="sub-header">
+        SESSION : {{ report.student.session_year }} :: CLASS : {{ report.student.class_name }} :: SEC : {{
+        report.student.section }}
+    </div>
+
+    <div class="section-title">STUDENT PROFILE</div>
+
+    <table style="width: 100%; margin-bottom: 0px;">
+        <tr>
+            <td style="width: 85%; vertical-align: top; padding-right: 10px;">
+                <table class="profile-table">
+                    <tr>
+                        <td class="label">Student ID :</td>
+                        <td>{{ report.student.st_id }}</td>
+                        <td width="10%"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Name of Student :</td>
+                        <td>{{ report.student.student_name }}</td>
+                        <td class="label">Father's Name :</td>
+                        <td>{{ report.student.fathers_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Date of Birth :</td>
+                        <td>{{ report.student.dob|date:"d-m-Y" }}</td>
+                        <td class="label">Mother's Name :</td>
+                        <td>{{ report.student.mothers_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Roll No. :</td>
+                        <td>{{ report.student.roll_no|default:"-" }}</td>
+                        <td class="label">Contact No. :</td>
+                        <td>{{ report.student.contact_1 }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">CBSE Reg No. :</td>
+                        <td>{{ report.student.cbse_reg|default:"0" }}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Residential Address :</td>
+                        <td colspan="3">{{ report.student.address|default:"-" }}</td>
+                    </tr>
+                </table>
+            </td>
+            <td style="width: 15%; vertical-align: top; text-align: right;">
+                {% if report.student.student_photo %}
+                <img src="{{ report.student.student_photo.path }}" class="student-photo" alt="Student Photo">
+                {% else %}
+                <div
+                    style="width: 80px; height: 100px; border: 2px solid #000; display: flex; align-items: center; justify-content: center; font-size: 9px; margin: 0 auto;">
+                    No Photo</div>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <div class="section-title">REPORT</div>
+    <div style="font-weight: bold; text-align: center; margin-bottom: 5px; font-size: 10px;">PART-1 : SCHOLASTIC AREA
+    </div>
+
+    <table class="marks-table">
+        <thead>
+            <tr>
+                <th rowspan="2" class="text-left" style="width: 20%;">Subject Details</th>
+                <th colspan="6">TERM-1 ( 100 Marks )</th>
+                <th colspan="6">TERM-2 ( 100 Marks )</th>
+                <th colspan="2">Overall Total</th>
+            </tr>
+            <tr>
+                <!-- Term 1 -->
+                <th>PT<br>(10)</th>
+                <th>NB<br>(5)</th>
+                <th>SE<br>(5)</th>
+                <th>Half<br>(80)</th>
+                <th>Total<br>(100)</th>
+                <th>Grade</th>
+
+                <!-- Term 2 -->
+                <th>PT<br>(10)</th>
+                <th>NB<br>(5)</th>
+                <th>SE<br>(5)</th>
+                <th>Exam<br>(80)</th>
+                <th>Total<br>(100)</th>
+                <th>Grade</th>
+
+                <!-- Overall -->
+                <th>Grand<br>(100)</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in report.marks_rows %}
+            <tr>
+                <td class="text-left">{{ row.subject }}</td>
+
+                <!-- T1 -->
+                <td>{{ row.t1.pt_eff|default:"-" }}</td>
+                <td>{{ row.t1.nb|default:"-" }}</td>
+                <td>{{ row.t1.se|default:"-" }}</td>
+                <td>{{ row.t1.exam|default:"-" }}</td>
+                <td>{{ row.t1.total|default:"-" }}</td>
+                <td>{{ row.grade }}</td>
+
+                <!-- T2 -->
+                <td>{{ row.t2.pt_eff|default:"-" }}</td>
+                <td>{{ row.t2.nb|default:"-" }}</td>
+                <td>{{ row.t2.se|default:"-" }}</td>
+                <td>{{ row.t2.exam|default:"-" }}</td>
+                <td>{{ row.t2.total|default:"-" }}</td>
+                <td>{{ row.grade }}</td>
+
+                <!-- Overall -->
+                <td>{{ row.final_avg|floatformat:0 }}</td>
+                <td>{{ row.grade }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="15" style="padding-top: 10px;">Scholastic Area Grading Scale : A1(91%-100%), A2(81%-90%),
+                    B1(71%-80%), B2(61%-70%), C1(51%-60%), C2(41%-50%), D(33%-40%), E(32% & Below)<br><br>
+                    *SE=Subject Enrichment, *PT=Periodic Test, *NB=NoteBook
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Overall Summary -->
+    <table class="marks-table2" style="width: 100%; margin-bottom: 20px;">
+        <tr>
+            <th style="text-align: left; height: 20px;">
+                OVERALL MARKS : {{ report.grand_total|floatformat:0 }} / {{ report.max_marks|default:"-" }}
+            </th>
+            <th style="text-align: left;">PERCENTAGE : {{ report.percentage|floatformat:2 }}%</th>
+            <th style="text-align: left;">OVERALL GRADE : {{ report.final_grade }}</th>
+        </tr>
+    </table>
+
+    <div style="font-weight: bold; text-align: center; margin-bottom: 5px; font-size: 10px;">PART-2 : CO-SCHOLASTIC AREA
+    </div>
+
+    <!-- Co-Scholastic & Discipline -->
+    <table class="side-by-side-table" width="100%">
+        <tr>
+            <td style="width: 50%;">
+                <table class="inner-table">
+                    <thead>
+                        <tr>
+                            <th colspan="3">Co-Scholastic Area Activities [ on a 3 point (A-C) grading scale ]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th class="text-left">Activities</th>
+                            <th>T1</th>
+                            <th>T2</th>
+                        </tr>
+                        {% for act in report.co_scholastic_rows|slice:":3" %}
+                        <tr>
+                            <td class="text-left">{{ act.name }}</td>
+                            <td>{{ act.t1 }}</td>
+                            <td>{{ act.t2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </td>
+            <td style="width: 2%;"></td> <!-- Spacer -->
+            <td style="width: 48%;">
+                <table class="inner-table">
+                    <thead>
+                        <tr>
+                            <th colspan="3">Discipline [ on a 3 point (A-C) grading scale ]</th>
+                        </tr>
+                        <tr>
+                            <th class="text-left">Activities</th>
+                            <th>T1</th>
+                            <th>T2</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-left">Regularity & Punctuality</td>
+                            <td>A</td>
+                            <td>A</td>
+                        </tr>
+                        <tr>
+                            <td class="text-left">Sincerity</td>
+                            <td>A</td>
+                            <td>A</td>
+                        </tr>
+                        <tr>
+                            <td class="text-left">Behaviour & Values</td>
+                            <td>A</td>
+                            <td>A</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <table class="remarks-table" style="width: 100%; margin-bottom: 20px;">
+        <tr>
+            <th style="text-align: left;">Class Teacher's Remark: {{ report.final_remark|default:"GOOD" }} </th>
+            <th style="text-align: right;">ATTENDANCE : {{ report.attendance|default:"-" }}</th>
+        </tr>
+    </table>
+
+
+    <table class="marks-table2" style="width: 100%; margin-bottom: 20px;">
+        <tr>
+            <th style="text-align: left; padding: 10px 8px 8px 5px; font-size: 12px;">
+                Result (As per RTE Act 2009) : PROMOTED TO CLASS {{ report.next_class|default:"Next Class" }}
+            </th>
+        </tr>
+    </table>
+
+    <br>
+    <table style="width: 100%; margin-top: 40px;">
+        <tr>
+            <td style="font-size: 10px;"><strong>Place : TINSUKIA</strong></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td style="font-size: 10px;"><strong>Date : {% now "d-M-Y" %}</strong></td>
+            <td style="text-align: center; vertical-align: bottom;"><strong>Sign of Class Teacher</strong></td>
+            <td style="text-align: center; vertical-align: bottom;"><strong>Sign of Principal</strong></td>
+        </tr>
+    </table>
+
+    <div class="sign-container">
+        <img src="{% static 'images/newSign.png' %}" class="sign" alt="Pr Sign">
+    </div>
+
+    {% if not forloop.last %}
+    <div class="page-break"></div>
+    {% endif %}
+    {% endfor %}
+
+</body>
+
+</html>

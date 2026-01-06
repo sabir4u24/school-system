@@ -1,0 +1,12 @@
+venv/
+*.pyc
+__pycache__/
+db.sqlite3
+.env
+.DS_Store
+staticfiles/
+media/
+Brain/
+task.md
+implementation_plan.md
+walkthrough.md
