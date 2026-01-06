@@ -503,6 +503,10 @@ def bulk_download_reports(request):
 def student_list(request):
     students = _get_filtered_students(request)
     
+    # Optimization: Calculate permissions once
+    is_teacher = hasattr(request.user, 'teacher_profile') or request.user.groups.filter(name='Teachers').exists()
+    is_staff = hasattr(request.user, 'staff_profile') or request.user.groups.filter(name='Office Staff').exists()
+    
     # Get choices for filters
     context = {
         'students': students,
@@ -516,6 +520,9 @@ def student_list(request):
         'selected_class': request.GET.get('class_name', ''),
         'selected_section': request.GET.get('section', ''),
         'selected_branch': request.GET.get('branch', ''),
+        # Pass flags to template
+        'is_teacher': is_teacher,
+        'is_staff': is_staff,
     }
 
     return render(request, 'core/student_list.html', context)

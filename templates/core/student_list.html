@@ -7,9 +7,9 @@
 <div class="card">
     <div style="margin-bottom: 2rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h2 style="margin: 0;">{% if request.user|is_teacher %}My Students{% else %}Registered Students{% endif %}</h2>
+            <h2 style="margin: 0;">{% if is_teacher %}My Students{% else %}Registered Students{% endif %}</h2>
             
-            {% if request.user.is_superuser or request.user|is_staff %}
+            {% if request.user.is_superuser or is_staff %}
             <a href="{% url 'admission' %}" class="btn">Add New Student</a>
             {% endif %}
         </div>
@@ -54,7 +54,7 @@
                     </select>
                 </div>
 
-                {% if not request.user|is_teacher %}
+                {% if not is_teacher %}
                 <div style="min-width: 150px;">
                     <label style="display: block; font-size: 0.8rem; margin-bottom: 0.2rem;">Branch</label>
                     <select name="branch" class="form-control" style="width: 100%;">
@@ -81,7 +81,7 @@
             <a href="{% url 'export_students_pdf' %}?{{ request.GET.urlencode }}" class="btn" target="_blank" style="background: #b30b00;">
                 Export to PDF
             </a>
-            {% if request.user|is_teacher or request.user.is_superuser %}
+            {% if is_teacher or request.user.is_superuser %}
             <button type="submit" form="bulkAssignForm" class="btn" style="background: var(--primary);">
                 Assign Subjects
             </button>
@@ -95,7 +95,7 @@
             <table style="width: 100%; border-collapse: collapse; text-align: left;">
                 <thead>
                     <tr style="border-bottom: 1px solid var(--border);">
-                        {% if request.user|is_teacher or request.user.is_superuser %}
+                        {% if is_teacher or request.user.is_superuser %}
                         <th style="padding: 1rem; width: 40px;">
                             <input type="checkbox" id="selectAll" style="cursor: pointer;">
                         </th>
@@ -103,7 +103,7 @@
                         <th style="padding: 1rem;">Student ID</th>
                         <th style="padding: 1rem;">Name</th>
                         <th style="padding: 1rem;">Stream</th>
-                        {% if not request.user|is_teacher %}
+                        {% if not is_teacher %}
                         <th style="padding: 1rem;">Branch</th>
                         {% endif %}
                         <th style="padding: 1rem;">Class</th>
@@ -115,7 +115,7 @@
                 <tbody>
                     {% for student in students %}
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                        {% if request.user|is_teacher or request.user.is_superuser %}
+                        {% if is_teacher or request.user.is_superuser %}
                         <td style="padding: 1rem;">
                             <input type="checkbox" name="selected_students" value="{{ student.st_id }}"
                                 class="student-checkbox" style="cursor: pointer;">
@@ -130,21 +130,21 @@
                             None
                             {% endif %}
                         </td>
-                        {% if not request.user|is_teacher %}
+                        {% if not is_teacher %}
                         <td style="padding: 1rem;">{{ student.school_branch }}</td>
                         {% endif %}
                         <td style="padding: 1rem;">{{ student.class_name }}</td>
                         <td style="padding: 1rem;">{{ student.section }}</td>
                         <td style="padding: 1rem;">{{ student.roll_no|default:"-" }}</td>
                         <td style="padding: 1rem;">
-                            {% if request.user.is_superuser or request.user|is_staff or request.user|is_teacher %}
+                            {% if request.user.is_superuser or is_staff or is_teacher %}
                             <a href="{% url 'student_detail' student.st_id %}" class="btn"
                                 style="padding: 6px 12px; font-size: 0.8rem; background: var(--secondary); color: white;">View</a>
                             <a href="{% url 'student_edit' student.st_id %}" class="btn"
                                 style="padding: 6px 12px; font-size: 0.8rem; background: transparent; border: 1px solid var(--text-color);">Edit</a>
                             {% endif %}
 
-                            {% if request.user.is_superuser or request.user|is_staff or request.user|is_teacher %}
+                            {% if request.user.is_superuser or is_staff or is_teacher %}
                             <a href="{% url 'assign_subjects' student.st_id %}" class="btn"
                                 style="padding: 6px 12px; font-size: 0.8rem; background: transparent; border: 1px solid var(--primary); color: var(--primary);">Subjects</a>
                             {% endif %}
@@ -152,7 +152,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="{% if request.user|is_teacher %}9{% else %}7{% endif %}"
+                        <td colspan="{% if is_teacher %}9{% else %}7{% endif %}"
                             style="padding: 2rem; text-align: center; color: var(--text-muted);">
                             No students found.
                         </td>
